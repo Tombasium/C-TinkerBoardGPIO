@@ -43,40 +43,44 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <map>
 using namespace std;
 
 string BASE_PATH = "/sys/class/gpio/";
 
-std::map<std::string, std::string> TinkerBoardPinMap =
-{
-	{3, 252},
-	{5, 253},
-	{7, 17},
-	{8, 161},
-	{10, 160},
-	{11, 164},
-	{12, 184},
-	{13, 166},
-	{15, 167},
-	{16, 162},
-	{18, 163},
-	{19, 257},
-	{21, 256},
-	{22, 171},
-	{23, 254},
-	{24, 255},
-	{26, 251},
-	{29, 233},
-	{26, 234},
-	{29, 165},
-	{31, 168},
-	{32, 239},
-	{33, 238},
-	{35, 185},
-	{36, 223},
-	{37, 224},
-	{38, 187},
-	{40, 188}
+std::map<std::string,std::string> pinMap;
+
+int TBPinPopulate()
+{	
+	pinMap["3"] = "252";
+	pinMap["5"] = "253";
+	pinMap["7"] = "17";
+	pinMap["8"] = "161";
+	pinMap["10"] = "160";
+	pinMap["11"] = "164";
+	pinMap["12"] = "184";
+	pinMap["13"] = "166";
+	pinMap["15"] = "167";
+	pinMap["16"] = "162";
+	pinMap["18"] = "163";
+	pinMap["19"] = "257";
+	pinMap["21"] = "256";
+	pinMap["22"] = "171";
+	pinMap["23"] = "254";
+	pinMap["24"] = "255";
+	pinMap["26"] = "251";
+	pinMap["27"] = "233";
+	pinMap["28"] = "234";
+	pinMap["29"] = "165";
+	pinMap["31"] = "168";
+	pinMap["32"] = "239";
+	pinMap["33"] = "238";
+	pinMap["35"] = "185";
+	pinMap["36"] = "223";
+	pinMap["37"] = "224";
+	pinMap["38"] = "187";
+	pinMap["40"] = "188";
+	return 0;
 }
 
 // Function to export a pin using the sysfs
@@ -228,9 +232,21 @@ int SendAndStop(char* pinName)
 	return 0;
 }
 
-char PinNameConverter(int pinNum)
+const char PinNameConverter(int pinNum)
 {
-	
+	char buffer [5];
+	char _pinNum = snprintf(buffer, "%c", pinNum);
+	std::string _pinNum1(_pinNum,2);
+	std::string pinName = pinMap[_pinNum1];
+	//if(pinName != pinMap.end())
+	//{
+		return pinName.c_str();
+	//}
+	//else 
+	//{
+	//	std::cout << "Pin Not found";
+	//	return -1;
+	//}
 }
 
 int Testing()
@@ -255,9 +271,12 @@ int Testing()
 	return 0;
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	TBPinPopulate();
 	std::cout << "GPIO Communicator started" << endl;
-	SendAndStop("171");
+	//
+	char toSend = PinNameConverter(argv[1]);
+	SendAndStop(argv[1]);
 	return 0;
 }
